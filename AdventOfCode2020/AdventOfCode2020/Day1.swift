@@ -17,7 +17,7 @@ func intListInput(path: String) -> [Int] {
 }
 
 func input11() -> [Int] {
-    let path = "/Users/paladetimotei/Documents/Developer/Becoming Fantastic/AdventOfCode2020/AdventOfCode2020/input/input1_1.txt"
+    let path = "/Users/paladetimotei/Documents/Developer/katas/AdventOfCode2020/AdventOfCode2020/input/input1_1.txt"
     return intListInput(path: path)
 }
 

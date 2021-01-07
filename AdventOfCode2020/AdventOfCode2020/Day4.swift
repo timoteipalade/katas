@@ -80,7 +80,7 @@ func run41_Example() {
 }
 
 func input41() -> String {
-    let path = "/Users/paladetimotei/Documents/Developer/Becoming Fantastic/AdventOfCode2020/AdventOfCode2020/input/input4_1.txt"
+    let path = "/Users/paladetimotei/Documents/Developer/katas/AdventOfCode2020/AdventOfCode2020/input/input4_1.txt"
     return try! String(contentsOfFile: path)
 }
 
