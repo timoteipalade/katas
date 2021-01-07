@@ -45,25 +45,18 @@ func isValid(_ passport: String) -> Bool {
     // passport keys can be separated by new lines or spaces
     let entries = passport.split(separator: "\n").flatMap({ $0.split(separator: " ")})
     var requiredKeys = Set<PassportKey>()
+
     for entry in entries {
         let comp = entry.split(separator: ":")
+        let value = String(comp[1])
         guard let key = PassportKey(rawValue: String(comp.first!)) else { continue }
         
-        if key.isRequired()  {
+        if key.isRequired() && key.isValid(value: value) {
             requiredKeys.insert(key)
         }
-        
-        let value = String(comp[1])
-        if !key.isValid(value: value) {
-            return false
-        }
     }
     
-    if requiredKeys.count == PassportKeys.requiredCount() {
-        return true
-    }
-    
-    return false
+    return requiredKeys.count == PassportKeys.requiredCount()
 }
 
 func run41_Example() {
