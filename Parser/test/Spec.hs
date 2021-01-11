@@ -10,7 +10,7 @@ test name p input expected = do
   let got = parse p input
   putStrLn (show (got == expected) ++ " > " ++ name)
 
-test1 :: Eq a => Show a => String -> Maybe a -> Maybe a -> IO ()
+test1 :: Eq a => Show a => String -> a -> a -> IO ()
 test1 name result expected = do
   putStrLn (show (result == expected) ++ " > " ++ name)
   --print result
@@ -47,11 +47,11 @@ main = do
   putStrLn ""
 
   -- separatedBy
-  test1 "separatedBy with empty string and empty separator" (separatedBy "" "" []) (Just [])
-  test1 "separatedBy: not able to separate with character separator" (separatedBy "Hello" " " []) (Just ["Hello"])
-  test1 "separatedBy: separate in 2 with character separator" (separatedBy "Hello World" " " []) (Just ["Hello", "World"])
-  test1 "separatedBy: separate in 3 with character separator" (separatedBy "Hello Worldy Character" " " []) (Just ["Hello", "Worldy", "Character"])
-  test1 "separatedBy: not able to separate with string separator" (separatedBy "Hello" "\n\n" []) (Just ["Hello"])
-  test1 "separatedBy: separate in 2 with string separator" (separatedBy "Hello\n\nWorld" "\n\n" []) (Just ["Hello", "World"])
-  test1 "separatedBy: separate in 3 with string separator" (separatedBy "Hello\n\nWorldy\n\nCharacter" "\n\n" []) (Just ["Hello", "Worldy", "Character"])
+  test1 "separatedBy with empty string and empty separator" (separatedBy "" "" []) []
+  test1 "separatedBy: not able to separate with character separator" (separatedBy "Hello" " " []) ["Hello"]
+  test1 "separatedBy: separate in 2 with character separator" (separatedBy "Hello World" " " []) ["Hello", "World"]
+  test1 "separatedBy: separate in 3 with character separator" (separatedBy "Hello Worldy Character" " " []) ["Hello", "Worldy", "Character"]
+  test1 "separatedBy: not able to separate with string separator" (separatedBy "Hello" "\n\n" []) ["Hello"]
+  test1 "separatedBy: separate in 2 with string separator" (separatedBy "Hello\n\nWorld" "\n\n" []) ["Hello", "World"]
+  test1 "separatedBy: separate in 3 with string separator" (separatedBy "Hello\n\nWorldy\n\nCharacter" "\n\n" []) ["Hello", "Worldy", "Character"]
   putStrLn ""

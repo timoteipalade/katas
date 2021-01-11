@@ -49,8 +49,8 @@ split' (x1: xs1) (x2: xs2) acc =
 
 type Separator = String
 
-separatedBy :: String -> Separator -> [String] -> Maybe [String]
-separatedBy [] _ acc = Just acc
+separatedBy :: String -> Separator -> [String] -> [String]
+separatedBy [] _ acc = acc
 separatedBy string sep acc = 
   case split' string sep [] of
     Nothing -> separatedBy [] sep (acc ++ [string])
