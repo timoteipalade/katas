@@ -13,7 +13,7 @@ test name p input expected = do
 test1 :: Eq a => Show a => String -> Maybe a -> Maybe a -> IO ()
 test1 name result expected = do
   putStrLn (show (result == expected) ++ " > " ++ name)
-  print result
+  --print result
 
 main :: IO ()
 main = do
@@ -43,14 +43,14 @@ main = do
   test1 "split' with empty string and non-empty separator" (split' "" "Hello" []) Nothing
   test1 "split' with non-empty string and empty separator" (split' "Hello" "" []) (Just ("", "Hello"))
   test1 "split' with non-empty string and non-empty separator" (split' "Hello\n\nWorld!" "\n\n" []) (Just ("Hello", "World!"))
-  test1 "split' with non-empty string and 1 character separator" (split' "Hello World!" "_" []) (Just ("Hello", "World!"))
+  test1 "split' with non-empty string and 1 character separator" (split' "Hello World!" " " []) (Just ("Hello", "World!"))
   putStrLn ""
 
   -- separatedBy
   test1 "separatedBy with empty string and empty separator" (separatedBy "" "" []) (Just [])
-  test1 "separatedBy: not able to separate with character separator" (separatedBy "Hello" "_" []) (Just ["Hello"])
-  test1 "separatedBy: separate in 2 with character separator" (separatedBy "Hello World" "_" []) (Just ["Hello", "World"])
-  test1 "separatedBy: separate in 3 with character separator" (separatedBy "Hello Worldy Character" "_" []) (Just ["Hello", "Worldy", "Character"])
+  test1 "separatedBy: not able to separate with character separator" (separatedBy "Hello" " " []) (Just ["Hello"])
+  test1 "separatedBy: separate in 2 with character separator" (separatedBy "Hello World" " " []) (Just ["Hello", "World"])
+  test1 "separatedBy: separate in 3 with character separator" (separatedBy "Hello Worldy Character" " " []) (Just ["Hello", "Worldy", "Character"])
   test1 "separatedBy: not able to separate with string separator" (separatedBy "Hello" "\n\n" []) (Just ["Hello"])
   test1 "separatedBy: separate in 2 with string separator" (separatedBy "Hello\n\nWorld" "\n\n" []) (Just ["Hello", "World"])
   test1 "separatedBy: separate in 3 with string separator" (separatedBy "Hello\n\nWorldy\n\nCharacter" "\n\n" []) (Just ["Hello", "Worldy", "Character"])
