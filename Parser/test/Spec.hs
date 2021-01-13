@@ -11,6 +11,11 @@ example = "ecl:gry pid:860033327 eyr:2020 hcl:#fffffd\n\
           \iyr:2013 ecl:amb cid:350 eyr:2023 pid:028048884\n\
           \hcl:#cfa07d byr:1929"
 
+validPass1 = "hcl:#ae17e1 iyr:2013\n\
+              \eyr:2024\n\
+              \ecl:brn pid:760753108 byr:1931\n\
+              \hgt:179cm"
+
 main :: IO ()
 main = do
 
@@ -22,4 +27,6 @@ main = do
 
   test1 "parse passports" (parse passports "eyr:123 byr:123\n\neyr:123 byr:123") [([[("eyr", "123"), ("byr", "123")], [("eyr", "123"), ("byr", "123")]], "")]
   test1 "parse example passports" (parse passports example) [([[("ecl","gry"),("pid","860033327"),("eyr","2020"),("hcl","#fffffd"),("byr","1937"),("iyr","2017"),("cid","147"),("hgt","183cm")],[("iyr","2013"),("ecl","amb"),("cid","350"),("eyr","2023"),("pid","028048884"),("hcl","#cfa07d"),("byr","1929")]],"")]
+
+  test1 "parse and validate passport with all required fields" (isValid (unpack (parse passport validPass1))) True
   putStrLn ""
