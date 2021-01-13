@@ -28,10 +28,10 @@ term = do k <- key
           v <- value
           return (k,v)
 
-termFollowedBy inp = do t <- term 
-                        char inp
+termFollowedBy sep = do t <- term 
+                        char sep
                         return t
 
 -- passport is one or more terms, separated by spaces or new lines
 -- passport inp = some term separatedBy space
-passport = some (termFollowedBy ' ' <|> term)
+passport = some (termFollowedBy ' ' <|> termFollowedBy '\n' <|> term)

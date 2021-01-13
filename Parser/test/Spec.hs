@@ -1,8 +1,3 @@
-import Data.Functor
-import Control.Monad
-import Control.Applicative hiding (many)
-import Data.Maybe
-
 import Lib
 import Parsing
 
@@ -17,5 +12,6 @@ main = do
   -- passport
   test1 "parse simple passport with no space" (parse passport "eyr:123") [([("eyr", "123")], "")]
   test1 "parse simple passport with space" (parse passport "eyr:123 ") [([("eyr", "123")], "")]
-  test1 "parse passport with 2 terms" (parse passport "eyr:123 byr:123") [([("eyr", "123"), ("byr", "123")], "")]
+  test1 "parse passport with 2 terms separated by space" (parse passport "eyr:123 byr:123") [([("eyr", "123"), ("byr", "123")], "")]
+  test1 "parse passport with 2 terms separated by new line" (parse passport "eyr:123\nbyr:123") [([("eyr", "123"), ("byr", "123")], "")]
   putStrLn ""
