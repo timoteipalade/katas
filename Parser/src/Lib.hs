@@ -1,4 +1,4 @@
-module Lib (key, value, term, termFollowedBy, passport) where
+module Lib (key, value, term, termFollowedBy, passport, passports) where
 
 import Parsing
 
@@ -20,9 +20,8 @@ key = do string "byr"
       <|> string "pid" 
       <|> string "cid"
 
-value = some alphanum 
+value = some (alphanum <|> char '#')
 
-term :: Parser (String, String)
 term = do k <- key
           char ':'
           v <- value
@@ -32,6 +31,8 @@ termFollowedBy sep = do t <- term
                         char sep
                         return t
 
--- passport is one or more terms, separated by spaces or new lines
--- passport inp = some term separatedBy space
-passport = some (termFollowedBy ' ' <|> termFollowedBy '\n' <|> term)
+-- passport starts with an optional new line followed by terms separated by space or new line
+passport = do string "\n" <|> string ""
+              some (termFollowedBy ' ' <|> termFollowedBy '\n' <|> term)
+
+passports = some passport
