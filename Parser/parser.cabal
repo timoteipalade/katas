@@ -4,7 +4,7 @@ cabal-version: 1.12
 --
 -- see: https://github.com/sol/hpack
 --
--- hash: fb4b438093a3608723b0835b6025cebe17e14d549d4af000caa3c2a5ab93058e
+-- hash: 6238326d9bda77be223882eff8019b070cadb0cbdf5957894568452c98537e27
 
 name:           parser
 version:        0.1.0.0
@@ -28,6 +28,7 @@ source-repository head
 library
   exposed-modules:
       Lib
+      Parsing
   other-modules:
       Paths_parser
   hs-source-dirs:

@@ -4,11 +4,7 @@ import Control.Applicative hiding (many)
 import Data.Maybe
 
 import Lib
-
-test :: Eq a => String -> Parser a -> String -> Maybe a -> IO ()
-test name p input expected = do
-  let got = parse p input
-  putStrLn (show (got == expected) ++ " > " ++ name)
+import Parsing
 
 test1 :: Eq a => Show a => String -> a -> a -> IO ()
 test1 name result expected = do
@@ -17,41 +13,9 @@ test1 name result expected = do
 
 main :: IO ()
 main = do
-  -- pfail
-  test "pfail with empty string" (failure :: Parser Int) "" Nothing
-  test "pfail with non-empty string" (failure :: Parser Int) "foo" Nothing
-  putStrLn ""
 
-  -- split
-  test1 "split with empty string" (split "" 'a' []) Nothing
-  test1 "split with non-empty string" (split "Hello World" ' ' []) (Just("Hello", "World"))
-  putStrLn ""
-
-  -- matchPrefix
-  test1 "matchPrefix with empty string and empty prefix" (matchPrefix "" "") (Just "")
-  test1 "matchPrefix with empty string and non-empty prefix" (matchPrefix "" "Hello") Nothing
-  test1 "matchPrefix with non-empty string and empty prefix" (matchPrefix "Hello" "") (Just "Hello")
-  test1 "matchPrefix with the same strings" (matchPrefix "Hello" "Hello") (Just "")
-  test1 "matchPrefix where the string is missing the last character" (matchPrefix "Hell" "Hello") Nothing
-  test1 "matchPrefix where the string is longer than the prefix" (matchPrefix "Hello You" "Hello") (Just " You")
-  test1 "matchPrefix where the prefix is 1 character" (matchPrefix "_You" "_") (Just "You")
-  test1 "matchPrefix where the prefix is 2 characters" (matchPrefix "_You" "_Y") (Just "ou")
-  putStrLn ""
-
--- split'
-  test1 "split' with empty string and empty separator" (split' "" "" []) Nothing
-  test1 "split' with empty string and non-empty separator" (split' "" "Hello" []) Nothing
-  test1 "split' with non-empty string and empty separator" (split' "Hello" "" []) (Just ("", "Hello"))
-  test1 "split' with non-empty string and non-empty separator" (split' "Hello\n\nWorld!" "\n\n" []) (Just ("Hello", "World!"))
-  test1 "split' with non-empty string and 1 character separator" (split' "Hello World!" " " []) (Just ("Hello", "World!"))
-  putStrLn ""
-
-  -- separatedBy
-  test1 "separatedBy with empty string and empty separator" (separatedBy "" "" []) []
-  test1 "separatedBy: not able to separate with character separator" (separatedBy "Hello" " " []) ["Hello"]
-  test1 "separatedBy: separate in 2 with character separator" (separatedBy "Hello World" " " []) ["Hello", "World"]
-  test1 "separatedBy: separate in 3 with character separator" (separatedBy "Hello Worldy Character" " " []) ["Hello", "Worldy", "Character"]
-  test1 "separatedBy: not able to separate with string separator" (separatedBy "Hello" "\n\n" []) ["Hello"]
-  test1 "separatedBy: separate in 2 with string separator" (separatedBy "Hello\n\nWorld" "\n\n" []) ["Hello", "World"]
-  test1 "separatedBy: separate in 3 with string separator" (separatedBy "Hello\n\nWorldy\n\nCharacter" "\n\n" []) ["Hello", "Worldy", "Character"]
+  -- passport
+  test1 "parse simple passport with no space" (parse passport "eyr:123") [([("eyr", "123")], "")]
+  test1 "parse simple passport with space" (parse passport "eyr:123 ") [([("eyr", "123")], "")]
+  test1 "parse passport with 2 terms" (parse passport "eyr:123 byr:123") [([("eyr", "123"), ("byr", "123")], "")]
   putStrLn ""
