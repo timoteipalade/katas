@@ -16,6 +16,11 @@ validPass1 = "hcl:#ae17e1 iyr:2013\n\
               \ecl:brn pid:760753108 byr:1931\n\
               \hgt:179cm"
 
+invalidPass1 = "hcl:#ae17e1 iyr:2013\n\
+              \eyr:2050\n\
+              \ecl:brn pid:760753108 byr:1931\n\
+              \hgt:179cm"
+
 main :: IO ()
 main = do
 
@@ -29,4 +34,6 @@ main = do
   test1 "parse example passports" (parse passports example) [([[("ecl","gry"),("pid","860033327"),("eyr","2020"),("hcl","#fffffd"),("byr","1937"),("iyr","2017"),("cid","147"),("hgt","183cm")],[("iyr","2013"),("ecl","amb"),("cid","350"),("eyr","2023"),("pid","028048884"),("hcl","#cfa07d"),("byr","1929")]],"")]
 
   test1 "parse and validate passport with all required fields" (fmap hasRequiredFields (result (parse passport validPass1))) (Just True)
+  test1 "parse and validate passport with valid fields" (fmap areFieldsValid (result (parse passport validPass1))) (Just True)
+  test1 "parse and validate passport with invalid fields" (fmap areFieldsValid (result (parse passport invalidPass1))) (Just False)
   putStrLn ""

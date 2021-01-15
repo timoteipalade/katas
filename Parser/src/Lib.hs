@@ -96,27 +96,29 @@ count len = P (\inp -> if length inp == len
                         then [("", inp)]
                         else [])
 
-byr :: Parser Bool
+byr :: Parser Int
 byr = do count 4
          x <- int
-         return (x >= 1920 && x <= 2002)
+         if x >= 1920 && x <= 2002 then return x else empty
 
-iyr :: Parser Bool
+iyr :: Parser Int
 iyr = do count 4
          x <- int
-         return (x >= 2010 && x <= 2020)
+         if x >= 2010 && x <= 2020 then return x else empty 
 
-eyr :: Parser Bool
+eyr :: Parser Int
 eyr = do count 4
          x <- int
-         return (x >= 2020 && x <= 2030)
+         if x >= 2020 && x <= 2030 then return x else empty 
 
-hgt :: Parser Bool
+data Height = Cm Int | In Int
+
+hgt :: Parser Height 
 hgt = do x <- nat
          y <- string "cm" <|> string "in"
          if y == "cm" 
-               then return (x >= 150 && x <= 193)
-               else return (x >= 59 && x <= 76)
+               then if x >= 150 && x <= 193 then return (Cm x) else empty
+               else if x >= 59 && x <= 76 then return (In x) else empty 
 
 hcl :: Parser String
 hcl = do char '#' 
