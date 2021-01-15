@@ -28,5 +28,5 @@ main = do
   test1 "parse passports" (parse passports "eyr:123 byr:123\n\neyr:123 byr:123") [([[("eyr", "123"), ("byr", "123")], [("eyr", "123"), ("byr", "123")]], "")]
   test1 "parse example passports" (parse passports example) [([[("ecl","gry"),("pid","860033327"),("eyr","2020"),("hcl","#fffffd"),("byr","1937"),("iyr","2017"),("cid","147"),("hgt","183cm")],[("iyr","2013"),("ecl","amb"),("cid","350"),("eyr","2023"),("pid","028048884"),("hcl","#cfa07d"),("byr","1929")]],"")]
 
-  test1 "parse and validate passport with all required fields" (isValid (unpack (parse passport validPass1))) True
+  test1 "parse and validate passport with all required fields" (fmap hasRequiredFields (result (parse passport validPass1))) (Just True)
   putStrLn ""
