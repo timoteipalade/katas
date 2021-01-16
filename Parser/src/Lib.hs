@@ -63,9 +63,7 @@ requiredFields :: Set.Set [Char]
 requiredFields = Set.fromList ["byr", "iyr", "eyr", "hgt", "hcl", "ecl", "pid"]
 
 foldFunc :: (String, String) -> Int -> Int 
-foldFunc (first, _) z = if Set.member first requiredFields
-                        then z + 1
-                        else z
+foldFunc (key, _) z = if Set.member key requiredFields then z + 1 else z
 
 -- Field Validation
 
@@ -81,13 +79,13 @@ foldFunc (first, _) z = if Set.member first requiredFields
 -- cid (Country ID) - ignored, missing or not.
 
 isFieldValid :: (String, String) -> Bool 
-isFieldValid ("byr", value) = successful (result (parse byr value))
-isFieldValid ("iyr", value) = successful (result (parse iyr value))
-isFieldValid ("eyr", value) = successful (result (parse eyr value))
-isFieldValid ("hgt", value) = successful (result (parse hgt value))
-isFieldValid ("hcl", value) = successful (result (parse hcl value))
-isFieldValid ("ecl", value) = successful (result (parse ecl value))
-isFieldValid ("pid", value) = successful (result (parse pid value))
+isFieldValid ("byr", value) = successful (parse byr value)
+isFieldValid ("iyr", value) = successful (parse iyr value)
+isFieldValid ("eyr", value) = successful (parse eyr value)
+isFieldValid ("hgt", value) = successful (parse hgt value)
+isFieldValid ("hcl", value) = successful (parse hcl value)
+isFieldValid ("ecl", value) = successful (parse ecl value)
+isFieldValid ("pid", value) = successful (parse pid value)
 isFieldValid ("cid", value) = True
 isFieldValid _ = False
 
@@ -145,6 +143,6 @@ result [] = Nothing
 result [(r, str)] = Just r
 result _ = Nothing
 
-successful :: Maybe a -> Bool
-successful Nothing = False
-successful (Just _) = True
+successful :: [(a,String)] -> Bool
+successful [(r, _)] = True
+successful _ = False
