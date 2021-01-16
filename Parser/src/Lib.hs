@@ -139,7 +139,6 @@ pid = do count 9
 -- Utils
 
 result :: [(a,String)] -> Maybe a
-result [] = Nothing 
 result [(r, str)] = Just r
 result _ = Nothing
 
