@@ -2,10 +2,12 @@ module Lib
     ( someFunc
     ) where
 
+import Control.Applicative
+
 someFunc :: IO ()
 someFunc = putStrLn "someFunc"
 
-type Hand = [Card]
+type Hand = [Card] -- 5 cards only
 data Card = Card {rank :: Rank, suite :: Suite}
 type Rank = Int
 data Suite = Clubs | Diamonds | Hearts | Spades deriving Eq
@@ -24,10 +26,52 @@ winningHands inp = []
 -- 8. Four of a kind
 -- 9. Straight flush
 
-type Category = Int -- between 1 and 9
+-- first Rank represents the category, the rest stand for other ranks that depend on the category
+-- to compare FullRanks you need to compare the ranks from left to right
+-- if one rank is bigger than the other, then one rank is bigger than the other 
+-- if all ranks are the same the FullRank is the same
+data FullRank = FullRank CategoryId Rank Rank Rank Rank Rank
+-- TODO: Implement comparison
 
-category :: Hand -> Category
-category inp = 1
+type CategoryId = Int -- number between 1 and 9
+
+newtype Category a = Category (Hand -> Maybe a)
+
+eval :: Category a -> Hand -> Maybe a
+eval (Category a) hand = a hand
+
+instance Functor Category where
+   -- fmap :: (a -> b) -> Parser a -> Parser b
+   fmap g p = Category (\hand -> case eval p hand of
+                                    Nothing -> Nothing 
+                                    Just a -> Just (g a))
+
+instance Applicative Category where
+   -- pure :: a -> Parser a
+   pure v = Category (\hand -> Just v)
+   -- <*> :: Parser (a -> b) -> Parser a -> Parser b
+   pg <*> px = Category (\hand -> case eval pg hand of
+                                    Nothing -> Nothing 
+                                    Just g -> eval (fmap g px) hand)
+
+instance Monad Category where
+   -- (>>=) :: Parser a -> (a -> Parser b) -> Parser b
+   p >>= f = Category (\hand -> case eval p hand of
+                                    Nothing -> Nothing 
+                                    Just v -> eval (f v) hand)
+
+instance Alternative Category where
+    empty = Category (\hand -> Nothing)
+
+    p <|> q = Category (\hand -> case eval p hand of
+                                    Nothing -> eval q hand
+                                    Just a -> Just a)
+
+
+
+--fullRank :: Hand -> Maybe FullRank
+pokerHand :: Category FullRank
+pokerHand = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
 
 -- returns the highest rank, if cards are consecutive
 consecutive :: Hand -> Maybe Rank
@@ -39,63 +83,57 @@ sameSuite :: Hand -> Maybe [Rank]
 sameSuite [] = Nothing
 sameSuite hand = Just []
 
--- returns the rank, if you have count cards of the same rank
-sameRank :: Rank -> Hand -> Maybe Rank
+-- returns the rank of the matching cars, and an array of the ranks of the other non matching cards ordered descendingly, if you have count cards of the same rank
+sameRank :: Rank -> Hand -> Maybe (Rank, [Rank])
 sameRank _ [] = Nothing
-sameRank count hand = Just 0
+sameRank count hand = Just (0, [])
 
--- returns the ranks of each pair, if you have at least one pair
-pairs :: Int -> Hand -> Maybe [Rank]
+-- returns the ranks of each pair ordered descendingly and the ranks of the remaining cards ordered descendingly, if you have at least one pair
+pairs :: Int -> Hand -> Maybe ([Rank], [Rank])
 pairs _ [] = Nothing
-pairs count hand = Just []
+pairs count hand = Just ([], [])
+
+-- returns the highest rank in a hand
+maxRank :: Hand -> Maybe Rank
+maxRank [] = Nothing 
+maxRank hand = Just 0
 
 -- Categories
 
-straightFlush :: Hand -> Maybe Category
-straightFlush [] = Nothing 
-straightFlush hand = do sameSuite hand
-                        consecutive hand
-                        return 9
+straightFlush :: Category FullRank
+straightFlush = Category (\hand -> do sameSuite hand
+                                      highestRank <- consecutive hand
+                                      return (FullRank 9 highestRank 0 0 0 0))
 
-fourOfAKind :: Hand -> Maybe Category
-fourOfAKind [] = Nothing
-fourOfAKind hand = do sameRank 4 hand
-                      return 8
+fourOfAKind :: Category FullRank
+fourOfAKind = Category (\hand -> do (rank, kicker:_) <- sameRank 4 hand
+                                    return (FullRank 8 rank kicker 0 0 0))
 
-fullHouse :: Hand -> Maybe Category
-fullHouse [] = Nothing
-fullHouse hand = do sameRank 2 hand
-                    sameRank 3 hand
-                    return 7
+fullHouse :: Category FullRank
+fullHouse = Category (\hand -> do (rank3, _) <- sameRank 3 hand
+                                  (rank2, _) <- sameRank 2 hand
+                                  return (FullRank 7 rank3 rank2 0 0 0))
 
-flush :: Hand -> Maybe Category
-flush [] = Nothing
-flush hand = do sameSuite hand
-                return 6
+flush :: Category FullRank
+flush = Category (\hand -> do (r5: r4: r3: r2: r1: _) <- sameSuite hand
+                              return (FullRank 6 r5 r4 r3 r2 r1))
 
-straight :: Hand -> Maybe Category
-straight [] = Nothing
-straight hand = do consecutive hand 
-                   return 5
+straight :: Category FullRank
+straight = Category (\hand -> do highestRank <- consecutive hand
+                                 return (FullRank 5 highestRank 0 0 0 0))
 
-threeOfAKind :: Hand -> Maybe Category
-threeOfAKind [] = Nothing 
-threeOfAKind hand = do sameRank 3 hand
-                       return 4
+threeOfAKind :: Category FullRank
+threeOfAKind = Category (\hand -> do (rank, r2: r1: _) <- sameRank 3 hand
+                                     return (FullRank 4 rank r2 r1 0 0))
 
-twoPairs :: Hand -> Maybe Category 
-twoPairs [] = Nothing 
-twoPairs hand = do pairs 2 hand
-                   return 3
+twoPairs :: Category FullRank
+twoPairs = Category (\hand -> do (rank1: rank2: _, kicker: _) <- pairs 2 hand
+                                 return (FullRank 3 rank1 rank2 kicker 0 0)) 
 
-onePair :: Hand -> Maybe Category
-onePair [] = Nothing
-onePair hand = do pairs 1 hand
-                  return 2
+onePair :: Category FullRank
+onePair = Category (\hand -> do (rank: _, r3: r2: r1: _) <- pairs 1 hand
+                                return (FullRank 2 rank r3 r2 r1 0))
 
-highCard :: Hand -> Maybe Category
-highCard [] = Nothing 
-highCard hand = Just 1
-
-                                
---straightFlush [] = Nothing
+highCard :: Category FullRank
+highCard = Category (\hand -> do highestRank <- maxRank hand
+                                 return (FullRank 1 highestRank 0 0 0 0))
