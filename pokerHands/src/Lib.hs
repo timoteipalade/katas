@@ -27,10 +27,10 @@ winningHands inp = []
 -- 9. Straight flush
 
 -- first Rank represents the category, the rest stand for other ranks that depend on the category
--- to compare FullRanks you need to compare the ranks from left to right
+-- to compare Scores you need to compare the ranks from left to right
 -- if one rank is bigger than the other, then one rank is bigger than the other 
--- if all ranks are the same the FullRank is the same
-data FullRank = FullRank CategoryId Rank Rank Rank Rank Rank
+-- if all ranks are the same the Score is the same
+data Score = Score CategoryId Rank Rank Rank Rank Rank
 -- TODO: Implement comparison
 
 type CategoryId = Int -- number between 1 and 9
@@ -67,10 +67,13 @@ instance Alternative Category where
                                     Nothing -> eval q hand
                                     Just a -> Just a)
 
+-- Note: To be able to implement the alternative you need to implement Functor and Applicative 
+-- Functor, Applicative, Monad, and Alternative need a metatype (a type that applies to another type.)
 
+-- Notes on implementation so far. I seem to be a little confused. Category FullRank does not make sense to me. 
 
---fullRank :: Hand -> Maybe FullRank
-pokerHand :: Category FullRank
+--fullRank :: Hand -> Maybe Score
+pokerHand :: Category Score
 pokerHand = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
 
 -- returns the highest rank, if cards are consecutive
@@ -98,42 +101,54 @@ maxRank :: Hand -> Maybe Rank
 maxRank [] = Nothing 
 maxRank hand = Just 0
 
+count :: Int -> Hand -> Maybe Int
+count i hand = if length hand == i then return i else Nothing
+
 -- Categories
 
-straightFlush :: Category FullRank
-straightFlush = Category (\hand -> do sameSuite hand
+straightFlush :: Category Score
+straightFlush = Category (\hand -> do count 5 hand
+                                      sameSuite hand
                                       highestRank <- consecutive hand
-                                      return (FullRank 9 highestRank 0 0 0 0))
+                                      return (Score 9 highestRank 0 0 0 0))
 
-fourOfAKind :: Category FullRank
-fourOfAKind = Category (\hand -> do (rank, kicker:_) <- sameRank 4 hand
-                                    return (FullRank 8 rank kicker 0 0 0))
+fourOfAKind :: Category Score
+fourOfAKind = Category (\hand -> do count 5 hand
+                                    (rank, kicker:_) <- sameRank 4 hand
+                                    return (Score 8 rank kicker 0 0 0))
 
-fullHouse :: Category FullRank
-fullHouse = Category (\hand -> do (rank3, _) <- sameRank 3 hand
+fullHouse :: Category Score
+fullHouse = Category (\hand -> do count 5 hand
+                                  (rank3, _) <- sameRank 3 hand
                                   (rank2, _) <- sameRank 2 hand
-                                  return (FullRank 7 rank3 rank2 0 0 0))
+                                  return (Score 7 rank3 rank2 0 0 0))
 
-flush :: Category FullRank
-flush = Category (\hand -> do (r5: r4: r3: r2: r1: _) <- sameSuite hand
-                              return (FullRank 6 r5 r4 r3 r2 r1))
+flush :: Category Score
+flush = Category (\hand -> do count 5 hand
+                              (r5: r4: r3: r2: r1: _) <- sameSuite hand
+                              return (Score 6 r5 r4 r3 r2 r1))
 
-straight :: Category FullRank
-straight = Category (\hand -> do highestRank <- consecutive hand
-                                 return (FullRank 5 highestRank 0 0 0 0))
+straight :: Category Score
+straight = Category (\hand -> do count 5 hand
+                                 highestRank <- consecutive hand
+                                 return (Score 5 highestRank 0 0 0 0))
 
-threeOfAKind :: Category FullRank
-threeOfAKind = Category (\hand -> do (rank, r2: r1: _) <- sameRank 3 hand
-                                     return (FullRank 4 rank r2 r1 0 0))
+threeOfAKind :: Category Score
+threeOfAKind = Category (\hand -> do count 5 hand
+                                     (rank, r2: r1: _) <- sameRank 3 hand
+                                     return (Score 4 rank r2 r1 0 0))
 
-twoPairs :: Category FullRank
-twoPairs = Category (\hand -> do (rank1: rank2: _, kicker: _) <- pairs 2 hand
-                                 return (FullRank 3 rank1 rank2 kicker 0 0)) 
+twoPairs :: Category Score
+twoPairs = Category (\hand -> do count 5 hand
+                                 (rank1: rank2: _, kicker: _) <- pairs 2 hand
+                                 return (Score 3 rank1 rank2 kicker 0 0)) 
 
-onePair :: Category FullRank
-onePair = Category (\hand -> do (rank: _, r3: r2: r1: _) <- pairs 1 hand
-                                return (FullRank 2 rank r3 r2 r1 0))
+onePair :: Category Score
+onePair = Category (\hand -> do count 5 hand
+                                (rank: _, r3: r2: r1: _) <- pairs 1 hand
+                                return (Score 2 rank r3 r2 r1 0))
 
-highCard :: Category FullRank
-highCard = Category (\hand -> do highestRank <- maxRank hand
-                                 return (FullRank 1 highestRank 0 0 0 0))
+highCard :: Category Score
+highCard = Category (\hand -> do count 5 hand
+                                 highestRank <- maxRank hand
+                                 return (Score 1 highestRank 0 0 0 0))
