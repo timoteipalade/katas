@@ -43,7 +43,6 @@ instance Alternative Category where
 -- Score 
 
 data Score = Score CategoryId Rank Rank Rank Rank Rank deriving Show
-type CategoryId = Int -- number between 1 and 9
 
 instance Eq Score where
    -- == :: Score -> Score -> Bool
@@ -69,6 +68,8 @@ pokerHandScore = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> st
 -- 7. Full House
 -- 8. Four of a kind
 -- 9. Straight flush
+
+type CategoryId = Int -- number between 1 and 9
 
 straightFlush :: Category Score
 straightFlush = Category (\hand -> do count 5 hand
