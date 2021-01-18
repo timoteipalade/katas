@@ -1,4 +1,4 @@
-module Lib() where
+module Lib(Hand, Card(..), Rank, Suite(..), Category(..), Score(..), CategoryId, pokerHandScore, eval) where
 import Control.Applicative
 
 type Hand = [Card]
@@ -42,8 +42,17 @@ instance Alternative Category where
 
 -- Score 
 
-data Score = Score CategoryId Rank Rank Rank Rank Rank
+data Score = Score CategoryId Rank Rank Rank Rank Rank deriving Show
 type CategoryId = Int -- number between 1 and 9
+
+instance Eq Score where
+   -- == :: Score -> Score -> Bool
+   (Score lcid lr1 lr2 lr3 lr4 lr5) == (Score rcid rr1 rr2 rr3 rr4 rr5) = lcid == rcid 
+                                                                           && lr1 == rr1
+                                                                           && lr2 == rr2
+                                                                           && lr3 == rr3
+                                                                           && lr4 == rr4 
+                                                                           && lr5 == rr5
 
 pokerHandScore :: Category Score
 pokerHandScore = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
