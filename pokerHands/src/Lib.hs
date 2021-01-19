@@ -161,7 +161,7 @@ highCard = Category (\hand -> do count 5 hand
 consecutive :: Hand -> Maybe Rank
 consecutive [] = Nothing 
 consecutive hand = if orderedRanks == consecutiveRanks
-                     then maxRank hand 
+                     then return maximumRank
                      else Nothing 
                      where 
                         orderedRanks = sortDesc (map rank hand)
@@ -189,7 +189,7 @@ pairs count hand = Just ([], [])
 -- returns the highest rank in a hand
 maxRank :: Hand -> Maybe Rank
 maxRank [] = Nothing 
-maxRank hand = Just (rank (head (sortDesc hand)))
+maxRank hand = Just (rank (maximum hand))
 
 -- returns the count if the length of the hand matches it
 count :: Int -> Hand -> Maybe Int
