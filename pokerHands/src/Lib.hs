@@ -8,7 +8,8 @@ module Lib(
    CategoryId, 
    pokerHandScore, 
    eval, 
-   sameSuite
+   sameSuite,
+   maxRank
    ) where
 import Control.Applicative
 import Data.Ord
@@ -166,8 +167,8 @@ sameSuite (head: tail) = if all (\el -> suite el == suite head) tail
                            then return (sortDesc (map rank (head: tail)))
                            else Nothing
 
--- returns the rank of the matching cars, and an array of the ranks of the other non matching cards ordered descendingly, if you have count cards of the same rank
-sameRank :: Rank -> Hand -> Maybe (Rank, [Rank])
+-- if you have count cards of the same rank, it returns the rank of the matching cards, and an array of the ranks of the other non matching cards ordered descendingly
+sameRank :: Int -> Hand -> Maybe (Rank, [Rank])
 sameRank _ [] = Nothing
 sameRank count hand = Just (0, [])
 
@@ -179,7 +180,7 @@ pairs count hand = Just ([], [])
 -- returns the highest rank in a hand
 maxRank :: Hand -> Maybe Rank
 maxRank [] = Nothing 
-maxRank hand = Just 0
+maxRank hand = Just (rank (head (sortDesc hand)))
 
 -- returns the count if the length of the hand matches it
 count :: Int -> Hand -> Maybe Int

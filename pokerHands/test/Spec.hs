@@ -8,7 +8,7 @@ straightFlush :: Hand
 straightFlush = [Card 11 Spades, Card 10 Spades, Card 9 Spades, Card 8 Spades, Card 7 Spades]
 
 fourOfAKind :: Hand
-fourOfAKind = [Card 11 Spades, Card 11 Hearts, Card 11 Diamonds, Card 11 Clubs, Card 10 Spades]
+fourOfAKind = [Card 12 Spades, Card 12 Hearts, Card 12 Diamonds, Card 12 Clubs, Card 10 Spades]
 
 fullHouse :: Hand
 fullHouse = [Card 11 Spades, Card 11 Hearts, Card 11 Diamonds, Card 10 Clubs, Card 10 Spades]
@@ -35,3 +35,7 @@ main = do
     test "all cards have same suite in a straightFlush" (sameSuite straightFlush) (Just [11, 10, 9, 8, 7])
     test "all cards DON'T have the same suite in a fourOfAKind" (sameSuite fourOfAKind) Nothing
     test "all cards DON'T have the same suite in a fourOfAKind" (sameSuite fullHouse) Nothing
+
+    -- test max rank
+    test "max rank of straightFlush" (maxRank straightFlush) (Just 11)
+    test "max rank of fourOfAKind" (maxRank fourOfAKind) (Just 12)
