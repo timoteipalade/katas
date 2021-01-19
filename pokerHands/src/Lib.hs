@@ -1,5 +1,18 @@
-module Lib(Hand, Card(..), Rank, Suite(..), Category(..), Score(..), CategoryId, pokerHandScore, eval) where
+module Lib(
+   Hand, 
+   Card(..), 
+   Rank, 
+   Suite(..), 
+   Category(..), 
+   Score(..), 
+   CategoryId, 
+   pokerHandScore, 
+   eval, 
+   sameSuite
+   ) where
 import Control.Applicative
+import Data.Ord
+import Data.List
 
 type Hand = [Card]
 
@@ -8,6 +21,15 @@ data Card = Card {rank :: Rank, suite :: Suite}
 type Rank = Int -- between 1 and and 14 (How can I specify this restriction?)
 
 data Suite = Clubs | Diamonds | Hearts | Spades deriving Eq
+
+instance Eq Card where
+   a == b = rank a == rank b
+
+instance Ord Card where
+   compare a b 
+      | rank a > rank b = GT
+      | rank a < rank b = LT
+      | otherwise = EQ
 
 -- Note: To be able to implement the alternative you need to implement Functor and Applicative 
 -- Functor, Applicative, Monad, and Alternative need a metatype (a type that applies to another type.)
@@ -54,7 +76,7 @@ instance Ord Score where
 
 -- helper
 recursiveCompare :: [Int] -> [Int] -> Ordering
-recursiveCompare (h1:[]) (h2:[])
+recursiveCompare [h1] [h2]
    | h1 > h2 = GT
    | h1 < h2 = LT
    | otherwise = EQ 
@@ -63,6 +85,7 @@ recursiveCompare (h1: t1) (h2: t2)
    | h1 < h2 = LT
    | otherwise = recursiveCompare t1 t2
 
+-- Poker Hand Score
 
 pokerHandScore :: Category Score
 pokerHandScore = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
@@ -139,7 +162,9 @@ consecutive hand = Just 0
 -- returns the ranks ordered descendingly, if all cards have the same suite
 sameSuite :: Hand -> Maybe [Rank]
 sameSuite [] = Nothing
-sameSuite hand = Just []
+sameSuite (head: tail) = if all (\el -> suite el == suite head) tail 
+                           then return (sortDesc (map rank (head: tail)))
+                           else Nothing
 
 -- returns the rank of the matching cars, and an array of the ranks of the other non matching cards ordered descendingly, if you have count cards of the same rank
 sameRank :: Rank -> Hand -> Maybe (Rank, [Rank])
@@ -163,3 +188,8 @@ count i hand = if length hand == i then return i else Nothing
 -- evaluates a category
 eval :: Category a -> Hand -> Maybe a
 eval (Category a) hand = a hand
+
+-- sorts in descending order
+sortDesc :: Ord a => [a] -> [a]
+sortDesc = sortOn Down
+
