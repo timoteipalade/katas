@@ -3,6 +3,7 @@ import Lib
 test :: Eq a => Show a => String -> a -> a -> IO ()
 test name result expected = do
   putStrLn (show (result == expected) ++ " > " ++ name)
+  --print result
 
 straightFlush :: Hand 
 straightFlush = [Card 11 Spades, Card 10 Spades, Card 9 Spades, Card 8 Spades, Card 7 Spades]
@@ -39,3 +40,10 @@ main = do
     -- test max rank
     test "max rank of straightFlush" (maxRank straightFlush) (Just 11)
     test "max rank of fourOfAKind" (maxRank fourOfAKind) (Just 12)
+
+    -- test boundedIterate
+    test "create list of 1,2,3,4,5" (boundedIterate (+ 1) 1 4) ([1,2,3,4,5])
+
+    -- test consecutive
+    test "straight flush is consecutive" (consecutive straightFlush) (Just 11)
+    test "four of a kind is not consecutive" (consecutive fourOfAKind) Nothing 

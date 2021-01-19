@@ -9,7 +9,9 @@ module Lib(
    pokerHandScore, 
    eval, 
    sameSuite,
-   maxRank
+   maxRank,
+   boundedIterate,
+   consecutive
    ) where
 import Control.Applicative
 import Data.Ord
@@ -158,7 +160,14 @@ highCard = Category (\hand -> do count 5 hand
 -- returns the highest rank, if cards are consecutive
 consecutive :: Hand -> Maybe Rank
 consecutive [] = Nothing 
-consecutive hand = Just 0
+consecutive hand = if orderedRanks == consecutiveRanks
+                     then maxRank hand 
+                     else Nothing 
+                     where 
+                        orderedRanks = sortDesc (map rank hand)
+                        consecutiveRanks = boundedIterate (\x -> x - 1) maximumRank (length hand - 1)
+                        maximumRank = rank (maximum hand)
+
 
 -- returns the ranks ordered descendingly, if all cards have the same suite
 sameSuite :: Hand -> Maybe [Rank]
@@ -194,3 +203,7 @@ eval (Category a) hand = a hand
 sortDesc :: Ord a => [a] -> [a]
 sortDesc = sortOn Down
 
+-- same functionality as iterate, but bounded
+boundedIterate :: (a -> a) -> a -> Int -> [a]
+boundedIterate f x 0 = [x]
+boundedIterate f x n = x : boundedIterate f (f x) (n-1)
