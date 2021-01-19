@@ -46,12 +46,23 @@ data Score = Score CategoryId Rank Rank Rank Rank Rank deriving Show
 
 instance Eq Score where
    -- == :: Score -> Score -> Bool
-   (Score lcid lr1 lr2 lr3 lr4 lr5) == (Score rcid rr1 rr2 rr3 rr4 rr5) = lcid == rcid 
-                                                                           && lr1 == rr1
-                                                                           && lr2 == rr2
-                                                                           && lr3 == rr3
-                                                                           && lr4 == rr4 
-                                                                           && lr5 == rr5
+   (Score lcid lr1 lr2 lr3 lr4 lr5) == (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5] == EQ
+
+instance Ord Score where
+   -- compare :: Score -> Score -> Ordering
+   compare (Score lcid lr1 lr2 lr3 lr4 lr5) (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5]
+
+-- helper
+recursiveCompare :: [Int] -> [Int] -> Ordering
+recursiveCompare (h1:[]) (h2:[])
+   | h1 > h2 = GT
+   | h1 < h2 = LT
+   | otherwise = EQ 
+recursiveCompare (h1: t1) (h2: t2) 
+   | h1 > h2 = GT
+   | h1 < h2 = LT
+   | otherwise = recursiveCompare t1 t2
+
 
 pokerHandScore :: Category Score
 pokerHandScore = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
