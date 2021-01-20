@@ -14,6 +14,12 @@ fourOfAKind = [Card 12 Spades, Card 12 Hearts, Card 12 Diamonds, Card 12 Clubs, 
 fullHouse :: Hand
 fullHouse = [Card 11 Spades, Card 11 Hearts, Card 11 Diamonds, Card 10 Clubs, Card 10 Spades]
 
+twoPairs :: Hand
+twoPairs = [Card 11 Spades, Card 11 Diamonds, Card 12 Hearts, Card 12 Clubs, Card 2 Hearts]
+
+onePair :: Hand 
+onePair = [Card 11 Spades, Card 11 Diamonds, Card 10 Hearts, Card 7 Spades, Card 3 Hearts]
+
 straightFlushScore = eval pokerHandScore straightFlush
 fourOfAKindScore = eval pokerHandScore fourOfAKind
 fullHouseScore = eval pokerHandScore fullHouse
@@ -46,4 +52,16 @@ main = do
 
     -- test consecutive
     test "straight flush is consecutive" (consecutive straightFlush) (Just 11)
-    test "four of a kind is not consecutive" (consecutive fourOfAKind) Nothing 
+    test "four of a kind is not consecutive" (consecutive fourOfAKind) Nothing
+
+    -- test sameRank
+    test "4 cards have sameRank in four of a kind" (sameRank 4 fourOfAKind) (Just ([12], [10]))
+    test "4 cards DON'T have the sameRank in a full house" (sameRank 4 fullHouse) Nothing
+
+    -- test pairs 
+    test "twoPairs has 2 pairs" (pairs 2 twoPairs) (Just ([12,11], [2]))
+    test "full house DOESN'T have 2 pairs" (pairs 2 fullHouse) Nothing
+
+    test "onePair has 1 pair" (pairs 1 onePair) (Just ([11], [10, 7, 3]))
+    test "twoPairs doesn't have just 1 pair" (pairs 1 twoPairs) Nothing 
+    test "fullHouse has 1 pair" (pairs 1 fullHouse) (Just ([10], [11]))

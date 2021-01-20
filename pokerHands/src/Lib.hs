@@ -8,10 +8,12 @@ module Lib(
    CategoryId, 
    pokerHandScore, 
    eval, 
+   consecutive,
    sameSuite,
+   sameRank,
+   pairs,
    maxRank,
-   boundedIterate,
-   consecutive
+   boundedIterate
    ) where
 import Control.Applicative
 import Data.Ord
@@ -116,13 +118,13 @@ straightFlush = Category (\hand -> do count 5 hand
 
 fourOfAKind :: Category Score
 fourOfAKind = Category (\hand -> do count 5 hand
-                                    (rank, kicker:_) <- sameRank 4 hand
+                                    (rank: _, kicker:_) <- sameRank 4 hand
                                     return (Score 8 rank kicker 0 0 0))
 
 fullHouse :: Category Score
 fullHouse = Category (\hand -> do count 5 hand
-                                  (rank3, _) <- sameRank 3 hand
-                                  (rank2, _) <- sameRank 2 hand
+                                  (rank3: _, _) <- sameRank 3 hand
+                                  (rank2: _, _) <- sameRank 2 hand
                                   return (Score 7 rank3 rank2 0 0 0))
 
 flush :: Category Score
@@ -137,7 +139,7 @@ straight = Category (\hand -> do count 5 hand
 
 threeOfAKind :: Category Score
 threeOfAKind = Category (\hand -> do count 5 hand
-                                     (rank, r2: r1: _) <- sameRank 3 hand
+                                     (rank: _, r2: r1: _) <- sameRank 3 hand
                                      return (Score 4 rank r2 r1 0 0))
 
 twoPairs :: Category Score
@@ -176,15 +178,27 @@ sameSuite (head: tail) = if all (\el -> suite el == suite head) tail
                            then return (sortDesc (map rank (head: tail)))
                            else Nothing
 
--- if you have count cards of the same rank, it returns the rank of the matching cards, and an array of the ranks of the other non matching cards ordered descendingly
-sameRank :: Int -> Hand -> Maybe (Rank, [Rank])
+-- if count cards have the same rank, it returns the ranks of those cards, and the ranks of the other cards, ordered descendingly.
+-- example: hand = 2D 3S 2S 3D 4H and count = 2, then the result will be ([3, 2], [4])
+-- because there are 2 sets of cards that have the same rank and length 2
+sameRank :: Int -> Hand -> Maybe ([Rank], [Rank])
 sameRank _ [] = Nothing
-sameRank count hand = Just (0, [])
+sameRank count hand = if found
+                        then Just (matchingRanks, otherRanks)
+                        else Nothing 
+                        where
+                           groupedCards = groupBy (\a b -> rank a == rank b) (sortDesc hand)
+                           matchingRanks = map (rank . head) $ filter (\group -> length group == count) groupedCards
+                           otherRanks = map (rank . head) $ filter (\group -> length group /= count) groupedCards
+                           found = matchingRanks /= []
 
--- returns the ranks of each pair ordered descendingly and the ranks of the remaining cards ordered descendingly, if you have at least one pair
+-- if count pairs exist, it returns the ranks of each pair and the ranks of the remaining cards, ordered descendingly.
 pairs :: Int -> Hand -> Maybe ([Rank], [Rank])
 pairs _ [] = Nothing
-pairs count hand = Just ([], [])
+pairs count hand = do (pairs, other) <- sameRank 2 hand
+                      if length pairs == count 
+                         then return (pairs, other)
+                         else Nothing 
 
 -- returns the highest rank in a hand
 maxRank :: Hand -> Maybe Rank
@@ -207,3 +221,4 @@ sortDesc = sortOn Down
 boundedIterate :: (a -> a) -> a -> Int -> [a]
 boundedIterate f x 0 = [x]
 boundedIterate f x n = x : boundedIterate f (f x) (n-1)
+--boundedIterate f x n = take n (iterate f x)
