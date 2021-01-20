@@ -68,6 +68,7 @@ highCardScore = eval score highCard
 
 allHands :: [Hand]
 allHands = [twoPairs, highCard, straightFlush, onePair, fullHouse, threeOfAKind, flush, fourOfAKind, straight]
+
 -- Tests
 
 main :: IO ()
