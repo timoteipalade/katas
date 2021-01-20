@@ -64,6 +64,10 @@ onePairScore = eval pokerHandScore onePair
 highCardScore :: Maybe Score
 highCardScore = eval pokerHandScore highCard
 
+-- Lists of Hands
+
+allHands :: [Hand]
+allHands = [twoPairs, highCard, straightFlush, onePair, fullHouse, threeOfAKind, flush, fourOfAKind, straight]
 -- Tests
 
 main :: IO ()
@@ -140,4 +144,7 @@ main = do
     test "onePair has 1 pair" (pairs 1 onePair) (Just ([11], [10, 7, 3]))
     test "twoPairs doesn't have just 1 pair" (pairs 1 twoPairs) Nothing 
     test "fullHouse has 1 pair" (pairs 1 fullHouse) (Just ([10], [11]))
+    putStrLn ""
+
+    test "best hand" (best allHands) straightFlush
     putStrLn ""

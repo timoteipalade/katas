@@ -6,6 +6,7 @@ module Lib(
    Category(..), 
    Score(..), 
    CategoryId, 
+   best,
    pokerHandScore, 
    eval, 
    consecutive,
@@ -22,11 +23,11 @@ import Data.List
 
 type Hand = [Card]
 
-data Card = Card {rank :: Rank, suite :: Suite}
+data Card = Card {rank :: Rank, suite :: Suite} deriving Show
 
 type Rank = Int -- between 1 and and 14 (How can I specify this restriction?)
 
-data Suite = Clubs | Diamonds | Hearts | Spades deriving Eq
+data Suite = Clubs | Diamonds | Hearts | Spades deriving (Eq, Show)
 
 instance Eq Card where
    a == b = rank a == rank b
@@ -89,6 +90,12 @@ recursiveCompare (h1: t1) (h2: t2)
    | h1 > h2 = GT
    | h1 < h2 = LT
    | otherwise = recursiveCompare t1 t2
+
+-- Poker Highest Hand
+
+best :: [Hand] -> Hand
+best [] = []
+best hands = maximumBy (\h1 h2 -> compare (eval pokerHandScore h1) (eval pokerHandScore h2)) hands
 
 -- Poker Hand Score
 
@@ -220,3 +227,5 @@ sortDesc = sortOn Down
 -- same functionality as iterate, but bounded
 boundedIterate :: (a -> a) -> a -> Int -> [a]
 boundedIterate f x n = take n (iterate f x)
+
+-- Conformances
