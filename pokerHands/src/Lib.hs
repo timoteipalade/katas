@@ -7,7 +7,7 @@ module Lib(
    Score(..), 
    CategoryId, 
    best,
-   pokerHandScore, 
+   score, 
    eval, 
    consecutive,
    sameSuite,
@@ -21,6 +21,8 @@ import Control.Applicative
 import Data.Ord
 import Data.List
 
+-- Data types
+
 type Hand = [Card]
 
 data Card = Card {rank :: Rank, suite :: Suite} deriving Show
@@ -29,78 +31,21 @@ type Rank = Int -- between 1 and and 14 (How can I specify this restriction?)
 
 data Suite = Clubs | Diamonds | Hearts | Spades deriving (Eq, Show)
 
-instance Eq Card where
-   a == b = rank a == rank b
-
-instance Ord Card where
-   compare a b 
-      | rank a > rank b = GT
-      | rank a < rank b = LT
-      | otherwise = EQ
-
--- Note: To be able to implement the alternative you need to implement Functor and Applicative 
--- Functor, Applicative, Monad, and Alternative need a metatype (a type that applies to another type.)
 newtype Category a = Category (Hand -> Maybe a)
 
-instance Functor Category where
-   -- fmap :: (a -> b) -> Parser a -> Parser b
-   fmap g p = Category (\hand -> case eval p hand of
-                                    Nothing -> Nothing 
-                                    Just a -> Just (g a))
-
-instance Applicative Category where
-   -- pure :: a -> Parser a
-   pure v = Category (\hand -> Just v)
-   -- <*> :: Parser (a -> b) -> Parser a -> Parser b
-   pg <*> px = Category (\hand -> case eval pg hand of
-                                    Nothing -> Nothing 
-                                    Just g -> eval (fmap g px) hand)
-
-instance Monad Category where
-   -- (>>=) :: Parser a -> (a -> Parser b) -> Parser b
-   p >>= f = Category (\hand -> case eval p hand of
-                                    Nothing -> Nothing 
-                                    Just v -> eval (f v) hand)
-
-instance Alternative Category where
-    empty = Category (\hand -> Nothing)
-
-    p <|> q = Category (\hand -> case eval p hand of
-                                    Nothing -> eval q hand
-                                    Just a -> Just a)
-
--- Score 
-
 data Score = Score CategoryId Rank Rank Rank Rank Rank deriving Show
-
-instance Eq Score where
-   -- == :: Score -> Score -> Bool
-   (Score lcid lr1 lr2 lr3 lr4 lr5) == (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5] == EQ
-
-instance Ord Score where
-   -- compare :: Score -> Score -> Ordering
-   compare (Score lcid lr1 lr2 lr3 lr4 lr5) (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5]
-
--- helper
-recursiveCompare :: [Int] -> [Int] -> Ordering
-recursiveCompare [] [] = EQ
-recursiveCompare [] x = error "recursiveCompare: Lists need to have the same size"
-recursiveCompare x [] = error "recursiveCompare: Lists need to have the same size"
-recursiveCompare (h1: t1) (h2: t2) 
-   | h1 > h2 = GT
-   | h1 < h2 = LT
-   | otherwise = recursiveCompare t1 t2
 
 -- Poker Highest Hand
 
 best :: [Hand] -> Hand
 best [] = []
-best hands = maximumBy (\h1 h2 -> compare (eval pokerHandScore h1) (eval pokerHandScore h2)) hands
+best hands = maximumBy handScore hands 
+               where handScore h1 h2 = compare (eval score h1) (eval score h2)
 
 -- Poker Hand Score
 
-pokerHandScore :: Category Score
-pokerHandScore = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
+score :: Category Score
+score = do straightFlush <|> fourOfAKind <|> fullHouse <|> flush <|> straight <|> threeOfAKind <|> twoPairs <|> onePair <|> highCard
 
 -- Category Scores
 
@@ -229,3 +174,68 @@ boundedIterate :: (a -> a) -> a -> Int -> [a]
 boundedIterate f x n = take n (iterate f x)
 
 -- Conformances
+
+-- Note: To be able to implement the alternative you need to implement Functor and Applicative 
+-- Functor, Applicative, Monad, and Alternative need a metatype (a type that applies to another type.)
+
+-- Card
+
+instance Eq Card where
+   a == b = rank a == rank b
+
+instance Ord Card where
+   compare a b 
+      | rank a > rank b = GT
+      | rank a < rank b = LT
+      | otherwise = EQ
+
+
+-- Score
+
+instance Eq Score where
+   -- == :: Score -> Score -> Bool
+   (Score lcid lr1 lr2 lr3 lr4 lr5) == (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5] == EQ
+
+instance Ord Score where
+   -- compare :: Score -> Score -> Ordering
+   compare (Score lcid lr1 lr2 lr3 lr4 lr5) (Score rcid rr1 rr2 rr3 rr4 rr5) = recursiveCompare [lcid, lr1, lr2, lr3, lr4, lr5] [rcid, rr1, rr2, rr3, rr4, rr5]
+
+-- helper
+recursiveCompare :: [Int] -> [Int] -> Ordering
+recursiveCompare [] [] = EQ
+recursiveCompare [] x = error "recursiveCompare: Lists need to have the same size"
+recursiveCompare x [] = error "recursiveCompare: Lists need to have the same size"
+recursiveCompare (h1: t1) (h2: t2) 
+   | h1 > h2 = GT
+   | h1 < h2 = LT
+   | otherwise = recursiveCompare t1 t2
+
+
+-- Category
+
+instance Functor Category where
+   -- fmap :: (a -> b) -> Parser a -> Parser b
+   fmap g p = Category (\hand -> case eval p hand of
+                                    Nothing -> Nothing 
+                                    Just a -> Just (g a))
+
+instance Applicative Category where
+   -- pure :: a -> Parser a
+   pure v = Category (\hand -> Just v)
+   -- <*> :: Parser (a -> b) -> Parser a -> Parser b
+   pg <*> px = Category (\hand -> case eval pg hand of
+                                    Nothing -> Nothing 
+                                    Just g -> eval (fmap g px) hand)
+
+instance Monad Category where
+   -- (>>=) :: Parser a -> (a -> Parser b) -> Parser b
+   p >>= f = Category (\hand -> case eval p hand of
+                                    Nothing -> Nothing 
+                                    Just v -> eval (f v) hand)
+
+instance Alternative Category where
+    empty = Category (\hand -> Nothing)
+
+    p <|> q = Category (\hand -> case eval p hand of
+                                    Nothing -> eval q hand
+                                    Just a -> Just a)

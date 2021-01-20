@@ -38,31 +38,31 @@ highCard = [Card 13 Diamonds, Card 12 Diamonds, Card 7 Clubs, Card 4 Clubs, Card
 
 -- Scores
 straightFlushScore :: Maybe Score
-straightFlushScore = eval pokerHandScore straightFlush
+straightFlushScore = eval score straightFlush
 
 fourOfAKindScore :: Maybe Score
-fourOfAKindScore = eval pokerHandScore fourOfAKind
+fourOfAKindScore = eval score fourOfAKind
 
 fullHouseScore :: Maybe Score
-fullHouseScore = eval pokerHandScore fullHouse
+fullHouseScore = eval score fullHouse
 
 flushScore :: Maybe Score
-flushScore = eval pokerHandScore flush
+flushScore = eval score flush
 
 straightScore :: Maybe Score
-straightScore = eval pokerHandScore straight
+straightScore = eval score straight
 
 threeOfAKindScore :: Maybe Score
-threeOfAKindScore = eval pokerHandScore threeOfAKind
+threeOfAKindScore = eval score threeOfAKind
 
 twoPairsScore :: Maybe Score
-twoPairsScore = eval pokerHandScore twoPairs
+twoPairsScore = eval score twoPairs
 
 onePairScore :: Maybe Score
-onePairScore = eval pokerHandScore onePair
+onePairScore = eval score onePair
 
 highCardScore :: Maybe Score
-highCardScore = eval pokerHandScore highCard
+highCardScore = eval score highCard
 
 -- Lists of Hands
 
