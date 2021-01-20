@@ -167,7 +167,7 @@ consecutive hand = if orderedRanks == consecutiveRanks
                      else Nothing 
                      where 
                         orderedRanks = sortDesc (map rank hand)
-                        consecutiveRanks = boundedIterate (\x -> x - 1) maximumRank (length hand - 1)
+                        consecutiveRanks = boundedIterate (\x -> x - 1) maximumRank (length hand)
                         maximumRank = rank (maximum hand)
 
 
@@ -219,6 +219,4 @@ sortDesc = sortOn Down
 
 -- same functionality as iterate, but bounded
 boundedIterate :: (a -> a) -> a -> Int -> [a]
-boundedIterate f x 0 = [x]
-boundedIterate f x n = x : boundedIterate f (f x) (n-1)
---boundedIterate f x n = take n (iterate f x)
+boundedIterate f x n = take n (iterate f x)

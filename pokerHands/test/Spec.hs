@@ -2,7 +2,7 @@ import Lib
 
 test :: Eq a => Show a => String -> a -> a -> IO ()
 test name result expected = do
-  putStrLn (show (result == expected) ++ " > " ++ name)
+  putStrLn ((if result == expected then "✅" else "🔴") ++ " > " ++ name)
   --print result
 
 straightFlush :: Hand 
@@ -48,7 +48,7 @@ main = do
     test "max rank of fourOfAKind" (maxRank fourOfAKind) (Just 12)
 
     -- test boundedIterate
-    test "create list of 1,2,3,4,5" (boundedIterate (+ 1) 1 4) ([1,2,3,4,5])
+    test "boundedIterate: create list of 1,2,3,4,5" (boundedIterate (+ 1) 1 5) ([1,2,3,4,5])
 
     -- test consecutive
     test "straight flush is consecutive" (consecutive straightFlush) (Just 11)
