@@ -26,6 +26,15 @@ fullHouseScore = eval pokerHandScore fullHouse
 
 main :: IO ()
 main = do 
+    -- TODO: 
+    -- Test the score for every category individually
+    -- Test score comparison between categories 
+    -- Test score comparison withing categories
+    -- For the last 2 points above: If the scores are calculated correctly
+    -- and the score comparison works correctly then the last 2 points will work correctly.
+    -- So all I need to do is to check the score for every category
+    -- And thest recursiveCompare.
+
     -- test simple score evaluation
     test "evaluate straigh flush score" (eval pokerHandScore straightFlush) (Just (Score 9 11 0 0 0 0))
     putStrLn ""
