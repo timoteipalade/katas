@@ -13,7 +13,8 @@ module Lib(
    sameRank,
    pairs,
    maxRank,
-   boundedIterate
+   boundedIterate,
+   recursiveCompare
    ) where
 import Control.Applicative
 import Data.Ord
@@ -81,10 +82,9 @@ instance Ord Score where
 
 -- helper
 recursiveCompare :: [Int] -> [Int] -> Ordering
-recursiveCompare [h1] [h2]
-   | h1 > h2 = GT
-   | h1 < h2 = LT
-   | otherwise = EQ 
+recursiveCompare [] [] = EQ
+recursiveCompare [] x = error "recursiveCompare: Lists need to have the same size"
+recursiveCompare x [] = error "recursiveCompare: Lists need to have the same size"
 recursiveCompare (h1: t1) (h2: t2) 
    | h1 > h2 = GT
    | h1 < h2 = LT
