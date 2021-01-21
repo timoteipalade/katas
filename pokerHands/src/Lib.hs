@@ -14,9 +14,9 @@ module Lib(
    sameRank,
    pairs,
    maxRank,
-   boundedIterate,
    recursiveCompare
    ) where
+
 import Control.Applicative
 import Data.Ord
 import Data.List
@@ -119,7 +119,7 @@ consecutive hand = if orderedRanks == consecutiveRanks
                      else Nothing 
                      where 
                         orderedRanks = sortDesc (map rank hand)
-                        consecutiveRanks = boundedIterate (\x -> x - 1) maximumRank (length hand)
+                        consecutiveRanks = take (length hand) $ iterate (\x -> x - 1) maximumRank 
                         maximumRank = rank (maximum hand)
 
 
@@ -168,10 +168,6 @@ eval (Category a) hand = a hand
 -- sorts in descending order
 sortDesc :: Ord a => [a] -> [a]
 sortDesc = sortOn Down
-
--- same functionality as iterate, but bounded
-boundedIterate :: (a -> a) -> a -> Int -> [a]
-boundedIterate f x n = take n (iterate f x)
 
 -- Conformances
 

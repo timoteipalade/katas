@@ -123,10 +123,6 @@ main = do
     test "max rank of fourOfAKind" (maxRank fourOfAKind) (Just 12)
     putStrLn ""
 
-    -- test boundedIterate
-    test "boundedIterate: create list of 1,2,3,4,5" (boundedIterate (+ 1) 1 5) ([1,2,3,4,5])
-    putStrLn ""
-
     -- test consecutive
     test "straight flush is consecutive" (consecutive straightFlush) (Just 11)
     test "four of a kind is not consecutive" (consecutive fourOfAKind) Nothing
