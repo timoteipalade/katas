@@ -13,8 +13,7 @@ data Cigarette = Gold | Chester | Kools | Lucky | Parliments
 data Color = Yellow | Green | Ivory | Red | Blue
 
 -- Solution Type 
-type Column = (Nationality, Animal, Drink, Cigarette, Color)
-type Solution = [Column]
+type Solution = ([Nationality], [Animal], [Drink], [Cigarette], [Color])
 
 -- Constraint Type
 
