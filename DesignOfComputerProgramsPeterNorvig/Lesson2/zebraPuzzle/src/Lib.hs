@@ -143,19 +143,23 @@ firstLevelWithAnimals = firstLevel >>= (\(n, _, _, _, _) -> map (\a -> (n, a, []
 secondLevel :: [Solution]
 secondLevel = filter weakCheck firstLevelWithAnimals
 
+secondLevelWithDrinks :: [Solution]
 secondLevelWithDrinks = secondLevel >>= (\(n, a, _, _, _) -> map (\d -> (n, a, d, [] :: [Cigarette], [] :: [Color])) drinks)
 
 thirdLevel :: [Solution]
 thirdLevel = filter weakCheck secondLevelWithDrinks
 
+thirdLevelWithCigarettes :: [Solution]
 thirdLevelWithCigarettes = thirdLevel >>= (\(n, a, d, _, _) -> map (\c -> (n, a, d, c, [] :: [Color])) cigarettes)
 
 fourthLevel :: [Solution]
 fourthLevel = filter weakCheck thirdLevelWithCigarettes
 
+fourthLevelWithColors :: [Solution]
 fourthLevelWithColors = fourthLevel >>= (\(n, a, d, c, _) -> map (\col -> (n, a, d, c, col)) colors)
 
 fifthLevel :: [Solution]
 fifthLevel = filter weakCheck fourthLevelWithColors
 
-run = secondLevel
+run :: [Solution]
+run = fifthLevel

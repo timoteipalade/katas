@@ -3,7 +3,7 @@ import Lib
 main :: IO ()
 main = do 
         --print run
-        print fifthLevel
+        print run
         print (length firstLevel)
         print (length secondLevel)
         print (length thirdLevel)
