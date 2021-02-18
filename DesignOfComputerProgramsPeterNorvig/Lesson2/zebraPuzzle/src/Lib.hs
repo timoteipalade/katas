@@ -1,6 +1,7 @@
 module Lib
     ( 
         run, 
+        zeroLevel,
         firstLevel, 
         secondLevel, 
         thirdLevel, 
