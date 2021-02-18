@@ -2,7 +2,6 @@ import Lib
 
 main :: IO ()
 main = do 
-        --print run
         print run
         print (length firstLevel)
         print (length secondLevel)
