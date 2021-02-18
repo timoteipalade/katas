@@ -5,7 +5,18 @@ module Lib
         secondLevel, 
         thirdLevel, 
         fourthLevel,
-        fifthLevel
+        fifthLevel,
+        zeroLevelWithNationalities,
+        firstLevelWithAnimals,
+        secondLevelWithDrinks,
+        thirdLevelWithCigarettes,
+        fourthLevelWithColors,
+        Nationality(..),
+        Animal(..),
+        Drink(..),
+        Cigarette(..),
+        Color(..),
+        Solution
     ) where
 
 import Data.List
@@ -91,20 +102,22 @@ norwegianNextToBlue (nat, ani, dri, cig, col) = do i <- elemIndex Norwegian nat
 
 
 allConstraints :: [Solution -> Maybe Bool]
-allConstraints = [englishInRed, 
-            spanishOwnsDog, 
-            coffeeDrunkInGreen, 
-            ukranianDrinksTea, 
-            greenRightOfIvory, 
-            oldGoldHasSnail, 
-            koolsSmokedInYellow, 
-            milkDrunkInMiddleHouse, 
-            norwegianInFirstHouse, 
-            chesterNextToFox, 
-            koolsNextToHorse, 
-            luckyDrinksJuice, 
-            japaneseSmokesParliments, 
-            norwegianNextToBlue]
+allConstraints = [
+    englishInRed, 
+    spanishOwnsDog, 
+    coffeeDrunkInGreen, 
+    ukranianDrinksTea, 
+    greenRightOfIvory, 
+    oldGoldHasSnail, 
+    koolsSmokedInYellow, 
+    milkDrunkInMiddleHouse, 
+    norwegianInFirstHouse, 
+    chesterNextToFox, 
+    koolsNextToHorse, 
+    luckyDrinksJuice, 
+    japaneseSmokesParliments, 
+    norwegianNextToBlue
+    ]
 
 -- Permutations
 
@@ -128,14 +141,22 @@ foldFunc a b = case a of
                 Nothing -> b
                 Just r -> r && b
 
+-- Check
 -- returns True if none of the constraints evaluates to False. It returns true even if some constraints return Nothing.
 weakCheck :: Solution -> Bool
 weakCheck sol = foldr foldFunc True result where
                     result = map (\constraint -> constraint sol) allConstraints
 
 
+-- Build the solutions array
+zeroLevel :: [Solution]
+zeroLevel = [([] :: [Nationality], [] :: [Animal], [] :: [Drink], [] :: [Cigarette], [] :: [Color])]
+
+zeroLevelWithNationalities :: [Solution]
+zeroLevelWithNationalities = zeroLevel >>= (\(_, _, _, _, _) -> map (\n -> (n, [] :: [Animal], [] :: [Drink], [] :: [Cigarette], [] :: [Color])) nationalities)
+
 firstLevel :: [Solution]
-firstLevel = filter weakCheck (map (\n -> (n, [] :: [Animal], [] :: [Drink], [] :: [Cigarette], [] :: [Color])) nationalities)
+firstLevel = filter weakCheck zeroLevelWithNationalities
 
 firstLevelWithAnimals :: [Solution]
 firstLevelWithAnimals = firstLevel >>= (\(n, _, _, _, _) -> map (\a -> (n, a, [] :: [Drink], [] :: [Cigarette], [] :: [Color])) animals)
